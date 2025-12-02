@@ -13,6 +13,7 @@ interface Props {
 export const CountIconButton = ({ disabled, onClick, size = 'sm', type }: Props) => {
   return (
     <Button
+      type='button'
       variant="outline"
       disabled={disabled}
       onClick={onClick}
