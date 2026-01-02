@@ -13,6 +13,8 @@ import {
 } from "@/shared/components";
 import { CheckoutFormSchema, CheckoutFormValues } from "@/shared/constants";
 import { useCart } from "@/shared/hooks";
+import { createOrder } from "@/app/actions";
+import toast from "react-hot-toast";
 
 export default function CheckoutPage() {
   const { items, totalAmount, removeCartItem, updateItemQuantity, loading } =
@@ -30,8 +32,17 @@ export default function CheckoutPage() {
     },
   });
 
-  const onSubmit = (data: CheckoutFormValues) => {
-    console.log(data);
+  const onSubmit = async (data: CheckoutFormValues) => {
+    try {
+      const url = await createOrder(data)
+      if(url) {
+        toast.success("Заказ успешно сформирован, ожидание оплаты!")
+        location.href = url
+      }
+    } catch (error) {
+      toast.error("Ошибка при оформлении заказа")
+      console.log("Ошибка:", error)
+    }
   };
 
   const onClickCountButton = (

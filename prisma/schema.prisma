@@ -120,7 +120,7 @@ enum UserRole {
 }
 
 enum OrderStatus {
-  PENDIG
+  PENDING
   SUCCEEDED
   CANCELED
 }
