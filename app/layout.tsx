@@ -1,12 +1,14 @@
-import { Nunito } from 'next/font/google';
-import './globals.css';
-import { ReactNode } from 'react';
-import { Toaster } from 'react-hot-toast';
+'use client';
+
+import { Nunito } from "next/font/google";
+import "./globals.css";
+import { ReactNode } from "react";
+import { Providers } from "@/shared/components";
 
 const nunito = Nunito({
-  subsets: ['cyrillic'],
-  variable: '--font-nunito',
-  weight: ['400', '500', '600', '700', '800', '900'],
+  subsets: ["cyrillic"],
+  variable: "--font-nunito",
+  weight: ["400", "500", "600", "700", "800", "900"],
 });
 
 export default async function RootLayout({
@@ -17,8 +19,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={nunito.className}>
-          {children}
-          <Toaster />
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
