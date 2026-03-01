@@ -2,10 +2,12 @@
 
 import { prisma } from "@/prisma/prisma-client";
 import { CheckoutFormValues } from "@/shared/constants";
-import { OrderStatus } from "@prisma/client";
-import { cookies } from "next/headers";
+import { OrderStatus, Prisma } from "@prisma/client";
 import { createPayment, sendEmail } from "@/shared/lib";
-import { PayOrderTemplate } from "@/shared/components";
+import { PayOrderTemplate, VerificationUserTemplate } from "@/shared/components";
+import { getUserSession } from "@/shared/lib/get-user-session";
+import { hashSync } from 'bcrypt';
+import { cookies } from "next/headers";
 
 export const createOrder = async (data: CheckoutFormValues) => {
   try {
@@ -105,3 +107,70 @@ export const createOrder = async (data: CheckoutFormValues) => {
     console.log("Error finding cart:", error);
   }
 };
+
+
+export const updateUserInfo = async (body: Prisma.UserUpdateInput) => {
+  try {
+    const currentUser = await getUserSession();
+
+    if (!currentUser) {
+      throw new Error("User not authenticated");
+    }
+
+    await prisma.user.update({
+      where: {
+        id: Number(currentUser.id),
+      },
+      data: {
+        fullname: body.fullname,
+        email: body.email,
+        password: body.password ? hashSync(body.password as string, 10) : body.password,
+      }
+    });
+  } catch (error) {
+    console.error("Error [UPDATE_USER]", error);
+    throw error;
+  }
+}
+
+export const registerUser = async (body: { email: string; password: string; fullname: string }) => {
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        email: body.email,
+      },
+    });
+    if (user) {
+      if (!user.verified) {
+        throw new Error("Почта не подтвержденна");
+      }
+      throw new Error("Пользователь с таким email уже существует");
+    }
+    const createdUser = await prisma.user.create({
+      data: {
+        fullname: body.fullname,
+        email: body.email,
+        password: hashSync(body.password, 10),
+      },
+    });
+
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await prisma.verificationCode.create({
+      data: {
+        userId: createdUser.id,
+        code: verificationCode,
+      },
+    });
+
+    sendEmail({
+      to: body.email,
+      subject: "Подтверждение почты | NEXT PIZZA",
+      template: VerificationUserTemplate({code: verificationCode})
+    });
+
+  } catch (error) {
+    console.error("Error [REGISTER_USER]", error);
+    throw error;
+  }
+}

@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const passwordSchema = z
   .string()
-  .min(4, { error: "Ввелите корректный пароль" });
+  .min(4, { error: "Введите корректный пароль" });
 
 export const formLoginSchema = z.object({
   email: z.email({ error: "Ввелите корректный Email" }),
@@ -12,7 +12,7 @@ export const formLoginSchema = z.object({
 export const formRegisterSchema = formLoginSchema
   .extend({
     fullName: z.string().min(4, { error: "Введите имя и фамилию" }),
-    confirmPassword: passwordSchema,
+    confirmPassword: z.string().min(4, { error: "Повторите введёный пароль" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     error: "Пароли не совподают",

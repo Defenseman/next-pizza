@@ -25,7 +25,7 @@ export const AuthModal = ({ open, onClose }: Props) => {
       <DialogContent className="w-[450px] bg-white p-10">
         <DialogTitle hidden={true} />
         {
-          type === 'Login' ? <LoginForm onClose={handleClose}/> : <RegisterForm/>
+          type === 'Login' ? <LoginForm onClose={handleClose}/> : <RegisterForm onClose={handleClose}/>
         }
         <div className="gap-2 flex flex">
           <Button
@@ -59,7 +59,7 @@ export const AuthModal = ({ open, onClose }: Props) => {
             Google
           </Button>
         </div>
-        <Button onClick={switchType} type="button" variant={"outline"}>
+        <Button onClick={switchType} type="button" variant={"outline"} className="h-12">
             {type === 'Login' ? 'Регистрация' : 'Войти'}
         </Button>
       </DialogContent>
