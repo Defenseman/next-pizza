@@ -1,5 +1,3 @@
-'use client';
-
 import { Nunito } from "next/font/google";
 import "./globals.css";
 import { ReactNode } from "react";
